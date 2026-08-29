@@ -1,0 +1,71 @@
+[
+    {
+        "case_id": "NS-MOCK-01",
+        "symptom": "VLAN 30 SVI interface is inactive",
+        "network_dna": {
+            "interfaces": [
+                {
+                    "name": "Vlan30",
+                    "status": "Physical: up, LineProtocol: down",
+                    "source": "show interfaces"
+                }
+            ],
+            "ip_addresses": [],
+            "subnets": [],
+            "gateways": [],
+            "vlans": [],
+            "trunks": [],
+            "routes": [],
+            "acls": [],
+            "nat": [],
+            "wireless": [],
+            "suspicious_observations": [
+                {
+                    "description": "Interface line protocol is down",
+                    "evidence": "line protocol is down",
+                    "source": "Automated DNA scanner"
+                }
+            ]
+        },
+        "root_cause": "No active physical switchports assigned to VLAN 30",
+        "fix": [
+            "Assign GigabitEthernet0/1 to vlan 30",
+            "no shutdown"
+        ],
+        "concept": "vlan",
+        "verified": true
+    },
+    {
+        "case_id": "CASE-001",
+        "symptom": "PC in VLAN 20 cannot reach PC in VLAN 30; both can ping their default gateway.",
+        "network_dna": {
+            "interfaces": [
+                {
+                    "name": "Vlan30",
+                    "status": "Physical: up, LineProtocol: down",
+                    "source": "show interfaces"
+                }
+            ],
+            "ip_addresses": [],
+            "subnets": [],
+            "gateways": [],
+            "vlans": [],
+            "trunks": [],
+            "routes": [],
+            "acls": [],
+            "nat": [],
+            "wireless": [],
+            "suspicious_observations": [
+                {
+                    "description": "Interface line protocol is down",
+                    "evidence": "line protocol is down",
+                    "source": "Automated DNA scanner"
+                }
+            ]
+        },
+        "root_cause": "The SVI for VLAN 30 has line protocol down because no active access port is assigned to VLAN 30, preventing inter-VLAN routing for the HR subnet.",
+        "fix": "Identify the switch port connected to PC-B (e.g., Gi0/3). | SW1(config)# interface GigabitEthernet0/3 | SW1(config-if)# switchport mode access | SW1(config-if)# switchport access vlan 30 | SW1(config-if)# no shutdown | Verify: SW1# show interfaces vlan 30  — line protocol should now be 'up'.",
+        "concept": "vlan",
+        "verified": true
+    }
+]

@@ -1,0 +1,337 @@
+==============================================================================
+  NetSage Rule Checker — Deterministic Analysis Report
+  Source: cases.csv   Cases: 32
+==============================================================================
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-001  [VLAN]  severity=high  layer=2 - Data Link
+  Symptom : PC in VLAN 20 cannot reach PC in VLAN 30; both can ping their default gateway.
+
+  ⚠  2 check(s) triggered:
+     [1] INTERFACE_DOWN  —  Interface administratively or protocol down
+         Evidence   : Vlan30 is up, line protocol is down
+         Explanation: Interface Vlan30 is up but line protocol is down. Check physical connectivity,
+                     encapsulation, or far-end status.
+     [2] MISSING_VLAN  —  VLAN referenced in config but absent from VLAN database
+         Evidence   : VLAN 30 is 'active' in vlan brief with no ports, and 'Vlan30 is up, line
+                     protocol is down'.
+         Explanation: VLAN 30 exists in the database but has no active access ports, so its SVI
+                     (Vlan30) cannot bring line protocol up. Assign at least
+                     one active port to VLAN 30.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-002  [VLAN]  severity=high  layer=2 - Data Link
+  Symptom : Trunk between SW1 and SW2 is up, but VLAN 10 traffic does not cross the trunk.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-003  [VLAN]  severity=medium  layer=2 - Data Link
+  Symptom : Native VLAN mismatch warning on trunk; spanning-tree port goes err-disabled.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-004  [VLAN]  severity=medium  layer=2 - Data Link
+  Symptom : Access port on SW1 is assigned to VLAN 50 but VLAN 50 does not exist in the
+            VLAN database.
+
+  ⚠  1 check(s) triggered:
+     [1] MISSING_VLAN  —  VLAN referenced in config but absent from VLAN database
+         Evidence   : VLAN 50 referenced via 'Access Mode VLAN (Inactive)' but not found in 'show
+                     vlan brief' table.
+         Explanation: VLAN 50 is used in port configuration but is not in the VLAN database. The
+                     port will be inactive. Fix: create the VLAN with 'vlan
+                     50' in global config.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-005  [VLAN]  severity=critical  layer=2 - Data Link
+  Symptom : All VLANs were wiped from a switch after a reload; only VLAN 1 remains.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-006  [GATEWAY]  severity=high  layer=3 - Network
+  Symptom : PC can ping hosts on the local subnet but cannot reach anything beyond the
+            router.
+
+  ⚠  4 check(s) triggered:
+     [1] GATEWAY_MISMATCH  —  Default gateway not in host's subnet / DHCP pool missing default-router
+         Evidence   : Default Gateway . . . . . . . : 192.168.1.254  (unreachable
+         Explanation: The default gateway 192.168.1.254 is explicitly marked as unreachable in the
+                     output. The host will fail to forward any off-subnet
+                     traffic.
+     [2] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : % Network not in table
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+     [3] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : Request timeout for icmp_seq
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+     [4] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : unreachable - no host
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-007  [GATEWAY]  severity=medium  layer=3 - Network
+  Symptom : Router has two paths to 10.0.0.0/8; traffic always takes the slower WAN link.
+
+  ⚠  1 check(s) triggered:
+     [1] WRONG_MASK  —  Suspicious or inconsistent subnet mask
+         Evidence   : ip address 10.0.0.0 255.0.0.0
+         Explanation: A /8 mask on a non-10.x.x.x interface is likely misconfigured.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-008  [GATEWAY]  severity=high  layer=3 - Network
+  Symptom : Hosts in 192.168.2.0/24 cannot reach 192.168.3.0/24 even though both subnets
+            connect to R1.
+
+  ⚠  3 check(s) triggered:
+     [1] WRONG_MASK  —  Suspicious or inconsistent subnet mask
+         Evidence   : ip address 192.168.2.1 255.255.255.255
+         Explanation: A /32 host mask on a non-loopback interface prevents broadcast and routing.
+     [2] WRONG_MASK  —  Suspicious or inconsistent subnet mask
+         Evidence   : Inconsistent masks in 192.168.2.0 network: 192.168.2.0/255.255.255.0,
+                     192.168.2.1/255.255.255.255
+         Explanation: Multiple subnet masks found for what appears to be the same 192.168.2.0
+                     network. This causes routing and host-reachability
+                     issues.
+     [3] INTERFACE_DOWN  —  Interface administratively or protocol down
+         Evidence   : GigabitEthernet0/1 is administratively down, line protocol is down
+         Explanation: Interface GigabitEthernet0/1 is administratively down. Use no shutdown to
+                     bring it up.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-009  [GATEWAY]  severity=high  layer=3 - Network
+  Symptom : HSRP failover does not occur when the active router loses its uplink.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-010  [DHCP]  severity=high  layer=3 - Network
+  Symptom : Clients in 10.20.0.0/24 receive IP addresses in the 10.10.0.0/24 range instead
+            of their own subnet.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-011  [DHCP]  severity=high  layer=3 - Network
+  Symptom : DHCP clients receive an IP address but no default gateway and no DNS server.
+
+  ⚠  1 check(s) triggered:
+     [1] GATEWAY_MISMATCH  —  Default gateway not in host's subnet / DHCP pool missing default-router
+         Evidence   : DHCP pool has 'network 192.168.1.0 255.255.255.0' but no 'default-router'
+                     statement.
+         Explanation: DHCP pool for 192.168.1.0/255.255.255.0 has no default-router option. Clients
+                     will receive an IP but no gateway, so off-subnet traffic
+                     will fail.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-012  [DHCP]  severity=critical  layer=3 - Network
+  Symptom : DHCP pool is exhausted; new clients get APIPA addresses (169.254.x.x).
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-013  [DHCP]  severity=high  layer=3 - Network
+  Symptom : DHCP server on R1 is not serving addresses to clients on a remote subnet
+            connected via R2.
+
+  ⚠  1 check(s) triggered:
+     [1] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : no subnet defined for
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-014  [DHCP]  severity=critical  layer=2 - Data Link
+  Symptom : A rogue DHCP server hands out wrong gateway addresses; clients lose internet
+            access intermittently.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-015  [DNS]  severity=high  layer=7 - Application
+  Symptom : Users can ping IP addresses but cannot browse websites by domain name.
+
+  ⚠  2 check(s) triggered:
+     [1] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : % No route to host
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+     [2] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : Temporary failure in name resolution
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-016  [DNS]  severity=high  layer=7 - Application
+  Symptom : Internal hostname resolution works but external DNS queries fail on a router
+            acting as DNS forwarder.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-017  [DNS]  severity=medium  layer=1 - Physical
+  Symptom : DNS resolution is intermittently slow or times out; some queries succeed,
+            others fail.
+
+  ⚠  1 check(s) triggered:
+     [1] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : TIMEOUT via Serial0/1
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-018  [ROUTING]  severity=critical  layer=3 - Network
+  Symptom : Traffic to 10.50.0.0/24 is dropped; traceroute shows packets looping between
+            R2 and R3.
+
+  ⚠  2 check(s) triggered:
+     [1] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : (loop)
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+     [2] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : ! No connected route
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-019  [ROUTING]  severity=high  layer=3 - Network
+  Symptom : OSPF adjacency between R1 and R2 is stuck in EXSTART/EXCHANGE state.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-020  [ROUTING]  severity=high  layer=3 - Network
+  Symptom : Default route is not being advertised into OSPF; branch offices cannot reach
+            the internet.
+
+  ⚠  1 check(s) triggered:
+     [1] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : % Network not in table
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-021  [ROUTING]  severity=high  layer=3 - Network
+  Symptom : EIGRP summary route from R2 is present on R1 but traffic to specific subnets
+            is blackholed.
+
+  ⚠  2 check(s) triggered:
+     [1] WRONG_MASK  —  Suspicious or inconsistent subnet mask
+         Evidence   : ip address 172.16.0.0 255.255.0.0
+         Explanation: A /16 mask may be too broad; verify addressing plan.
+     [2] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : % Network not in table
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-022  [ACL]  severity=medium  layer=7 - Application
+  Symptom : SSH to R1 from the management station is denied but Telnet works fine.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-023  [ACL]  severity=high  layer=4 - Transport
+  Symptom : Web server is reachable via ping but HTTP connections are established then
+            hang.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-024  [ACL]  severity=critical  layer=3 - Network
+  Symptom : ACL was meant to block only ICMP from outside but is also blocking all other
+            traffic.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-025  [ACL]  severity=medium  layer=3 - Network
+  Symptom : ACL has zero matches; traffic it should block is still flowing through.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-026  [NAT]  severity=high  layer=3 - Network
+  Symptom : Inside hosts browse the internet but external hosts cannot reach the internal
+            web server via its public IP.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-027  [NAT]  severity=critical  layer=1 - Physical
+  Symptom : NAT translations appear but internet access fails; inside/outside seem
+            reversed.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-028  [NAT]  severity=high  layer=3 - Network
+  Symptom : After an IOS upgrade, all NAT translations stopped working; show ip nat
+            translations is empty.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-029  [WIRELESS]  severity=critical  layer=2 - Data Link
+  Symptom : Wireless guest clients can reach the internet but can also reach internal
+            corporate servers.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-030  [WIRELESS]  severity=high  layer=2 - Data Link
+  Symptom : Wireless clients associate to the AP but cannot obtain a DHCP address; they
+            self-assign 169.254.x.x.
+
+  ✓  No deterministic checks triggered.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-031  [WIRELESS]  severity=medium  layer=2 - Data Link
+  Symptom : Wireless clients on the same SSID cannot communicate with each other; printers
+            and file shares stopped working.
+
+  ⚠  1 check(s) triggered:
+     [1] MISSING_ROUTE  —  Explicit routing or reachability failure message
+         Evidence   : Request timeout for icmp_seq
+         Explanation: An explicit routing or reachability failure was detected. Check the routing
+                     table ('show ip route'), interface status, and
+                     gateway/next-hop configuration.
+
+──────────────────────────────────────────────────────────────────────────────
+  CASE-032  [WIRELESS]  severity=high  layer=4 - Transport
+  Symptom : New AP is not joining the WLC; AP console shows 'DTLS connection failed'.
+
+  ✓  No deterministic checks triggered.
+
+
+==============================================================================
+  SUMMARY
+==============================================================================
+
+  Cases analysed     : 32
+  Cases with triggers: 13
+  Cases clean        : 19
+
+  Triggers by check type:
+    MISSING_ROUTE           12  —  Explicit routing or reachability failure message
+    WRONG_MASK               4  —  Suspicious or inconsistent subnet mask
+    INTERFACE_DOWN           2  —  Interface administratively or protocol down
+    MISSING_VLAN             2  —  VLAN referenced in config but absent from VLAN database
+    GATEWAY_MISMATCH         2  —  Default gateway not in host's subnet / DHCP pool missing default-router

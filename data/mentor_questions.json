@@ -1,0 +1,344 @@
+{
+    "vlan": {
+        "overview": "Virtual Local Area Networks (VLANs) segment a physical switch into multiple logical broadcast domains, improving performance and security by isolating traffic. Trunk links are configured between switches using the 802.1q protocol to multiplex frames from multiple VLANs over a single physical path, preserving their tags.",
+        "questions": [
+            {
+                "question": "What is the primary role of the 802.1q protocol?",
+                "options": [
+                    "To assign dynamic IP addresses to workstations.",
+                    "To insert a 4-byte VLAN identifier tag into Ethernet frame headers to multiplex traffic on trunks.",
+                    "To dynamically select the best routing path."
+                ],
+                "correct_answer": 1,
+                "hint": "Think about how multiple VLANs share a single trunk cable.",
+                "explanation": "802.1q inserts a tagging field containing the VLAN ID into the Ethernet frame header, allowing switches to identify the origin VLAN of trunked frames."
+            },
+            {
+                "question": "A VLAN Switch Virtual Interface (SVI) reports status 'up, line protocol is down'. What is the most likely cause?",
+                "options": [
+                    "The SVI interface was disabled globally with 'no service routing'.",
+                    "There are no active, forwarding access ports or trunk links assigned to that VLAN on the switch.",
+                    "The routing metric cost is mismatched between switches."
+                ],
+                "correct_answer": 1,
+                "hint": "An SVI requires at least one active physical port assigned to its VLAN to bring up its line protocol.",
+                "explanation": "A VLAN SVI's line protocol stays down unless the switch has at least one active physical port assigned to that VLAN in a Spanning Tree forwarding state."
+            },
+            {
+                "question": "A switch port configured for VLAN 10 shows 'Inactive' in 'show vlan'. How do you resolve this?",
+                "options": [
+                    "Create VLAN 10 in the switch database by entering config mode and typing 'vlan 10'.",
+                    "Shut down the interface and turn it back on.",
+                    "Configure the interface as a trunk port instead."
+                ],
+                "correct_answer": 0,
+                "hint": "The port is assigned to a VLAN that does not exist in the switch database.",
+                "explanation": "If a port is assigned to a VLAN that hasn't been created on the switch, the port remains inactive. Creating the VLAN in config mode activates the port."
+            }
+        ]
+    },
+    "routing": {
+        "overview": "Routing is a Layer 3 process that determines how data packets are forwarded across subnet boundaries. Routers build routing tables containing destination prefixes, next-hop IP addresses, and cost metrics using static configurations or dynamic routing protocols (like OSPF or EIGRP).",
+        "questions": [
+            {
+                "question": "Which entry in the routing table represents the default route (gateway of last resort)?",
+                "options": [
+                    "127.0.0.1/32",
+                    "0.0.0.0/0",
+                    "255.255.255.255/32"
+                ],
+                "correct_answer": 1,
+                "hint": "It matches any destination IP address when no specific route exists.",
+                "explanation": "The 0.0.0.0/0 prefix matches all destination IP addresses, serving as the fallback gateway path when no specific routes exist."
+            },
+            {
+                "question": "A router drops traffic destined for 10.20.30.0/24 with '% Network not in table'. What does this indicate?",
+                "options": [
+                    "The gateway interface has a bad subnet mask.",
+                    "The routing table lacks any static route or dynamic prefix matching the destination subnet.",
+                    "The connecting port has a duplex mismatch."
+                ],
+                "correct_answer": 1,
+                "hint": "The routing table contains no path for the targeted prefix.",
+                "explanation": "A router drops packets if it cannot find any matching prefix or default route in its routing table, returning a destination unreachable lookup failure."
+            },
+            {
+                "question": "Two routers are configured for OSPF but fail to form an adjacency, remaining stuck in INIT or DOWN. How do you resolve this?",
+                "options": [
+                    "Remove all static IP assignments on the interfaces.",
+                    "Ensure OSPF Hello and Dead intervals match exactly on the connecting interfaces.",
+                    "Configure access-ports on the connecting router links."
+                ],
+                "correct_answer": 1,
+                "hint": "Think about OSPF neighbor adjacency requirement parameters.",
+                "explanation": "OSPF requires neighbor routers to have matching Hello and Dead timers, area IDs, subnet masks, and authentication values to form adjacencies."
+            }
+        ]
+    },
+    "dhcp": {
+        "overview": "Dynamic Host Configuration Protocol (DHCP) automates the assignment of IP addresses, subnet masks, default gateways, and DNS servers to local hosts. Routers or server daemons maintain address pools and lease configurations to clients via a four-way handshake (DORA).",
+        "questions": [
+            {
+                "question": "Which DHCP configuration statement assigns the default gateway IP to client workstations?",
+                "options": [
+                    "dns-server",
+                    "default-router",
+                    "ip helper-address"
+                ],
+                "correct_answer": 1,
+                "hint": "Think about the client default gateway configuration term.",
+                "explanation": "The 'default-router' command within the DHCP pool configuration instructs the server to lease the default gateway IP address to clients."
+            },
+            {
+                "question": "Clients on a LAN obtain IP addresses via DHCP but cannot communicate with external subnets. The DHCP config shows only 'network' and 'dns-server'. What is missing?",
+                "options": [
+                    "An excluded-address list.",
+                    "The default-router option defining the gateway IP.",
+                    "The IP helper-address command on client ports."
+                ],
+                "correct_answer": 1,
+                "hint": "Without a default gateway leased, clients do not know where to forward off-subnet traffic.",
+                "explanation": "Lacking the default-router option means clients receive no gateway IP, preventing them from routing packets beyond their local subnet."
+            },
+            {
+                "question": "How do you reserve 192.168.1.1 through 192.168.1.10 to prevent DHCP lease conflicts?",
+                "options": [
+                    "Map them to the default-router option.",
+                    "Configure: 'ip dhcp excluded-address 192.168.1.1 192.168.1.10' globally.",
+                    "Configure static MAC address bindings for every port."
+                ],
+                "correct_answer": 1,
+                "hint": "You need to exclude these addresses from the DHCP dynamic allocation pool.",
+                "explanation": "The 'ip dhcp excluded-address' global command reserves specified ranges, preventing the DHCP server from dynamically assigning them to clients."
+            }
+        ]
+    },
+    "dns": {
+        "overview": "Domain Name System (DNS) resolves human-readable hostnames to numeric IP addresses. When a client requests a domain name, the local resolver queries configured name servers to retrieve the corresponding A or AAAA records.",
+        "questions": [
+            {
+                "question": "What parameter must be configured on client hosts to perform DNS resolution?",
+                "options": [
+                    "DNS server IP address.",
+                    "Subnet Mask.",
+                    "DNS default gateway."
+                ],
+                "correct_answer": 0,
+                "hint": "Clients must know the IP address of the server to query for name translation.",
+                "explanation": "Clients require a valid DNS server IP address (like 8.8.8.8) to send query packets for translating hostnames to IP addresses."
+            },
+            {
+                "question": "A client can ping 8.8.8.8 but fails to reach 'google.com' (unknown host). What is the issue?",
+                "options": [
+                    "The client gateway IP is incorrect.",
+                    "The DNS server is unreachable or misconfigured on the client.",
+                    "NAT translations are empty."
+                ],
+                "correct_answer": 1,
+                "hint": "Direct IP reachability is working, but hostname translation is failing.",
+                "explanation": "If pinging a public IP succeeds but resolving domain names fails, the client's DNS resolver settings are incorrect or the DNS server is unreachable."
+            },
+            {
+                "question": "How do you assign DNS servers dynamically to clients inside a Cisco router DHCP pool?",
+                "options": [
+                    "Configure 'dns-server 8.8.8.8' under the DHCP pool.",
+                    "Configure a static route to 8.8.8.8.",
+                    "Enable 'ip dns server' globally."
+                ],
+                "correct_answer": 0,
+                "hint": "This setting must be leased as part of the DHCP pool configuration.",
+                "explanation": "Adding 'dns-server [IP]' inside the 'ip dhcp pool' configuration leases the DNS server address to all client hosts dynamically."
+            }
+        ]
+    },
+    "acl": {
+        "overview": "Access Control Lists (ACLs) filter incoming or outgoing packets on router/switch interfaces. They check packet headers against sequential rule matches (IP, protocol, port) and permit or deny traffic based on the first matching rule, ending with an implicit deny.",
+        "questions": [
+            {
+                "question": "What is the default action when a packet does not match any rules in a Cisco ACL?",
+                "options": [
+                    "The packet is permitted.",
+                    "The packet is dropped by the implicit deny-all rule at the end.",
+                    "The packet is logged and forwarded to the gateway."
+                ],
+                "correct_answer": 1,
+                "hint": "Cisco ACLs block all unmatched traffic by default.",
+                "explanation": "Every Cisco ACL has an invisible 'deny ip any any' (implicit deny) rule at the end. Any packet not matching a permit statement is dropped."
+            },
+            {
+                "question": "An ACL designed to deny Telnet (port 23) is also blocking HTTP (port 80). The ACL has only 'deny tcp any any eq 23'. Why is HTTP blocked?",
+                "options": [
+                    "HTTP and Telnet share the same TCP ports.",
+                    "The implicit deny blocks all remaining traffic (including HTTP) because there is no 'permit' rule.",
+                    "The ACL is applied in the wrong direction."
+                ],
+                "correct_answer": 1,
+                "hint": "Remember the implicit action taken at the end of an ACL.",
+                "explanation": "Since the ACL has no 'permit' statements, any traffic not matching the Telnet rule (like HTTP) hits the implicit deny at the end and is blocked."
+            },
+            {
+                "question": "How do you correct the ACL that is blocking all non-Telnet traffic?",
+                "options": [
+                    "Remove the deny statement.",
+                    "Append 'permit ip any any' at the end of the ACL to allow other traffic.",
+                    "Change the ACL number."
+                ],
+                "correct_answer": 1,
+                "hint": "You need to explicitly permit other traffic after denying Telnet.",
+                "explanation": "Adding a permit statement at the end allows all other IP traffic to pass after the specific Telnet deny rule is evaluated."
+            }
+        ]
+    },
+    "nat": {
+        "overview": "Network Address Translation (NAT) maps private IP addresses (RFC 1918) to public IP addresses, conserving public IPv4 space and securing inside hosts. Dynamic NAT overload (PAT) maps multiple private IPs to a single public IP using unique source port numbers.",
+        "questions": [
+            {
+                "question": "What does Dynamic NAT Overload (PAT) use to map multiple inside hosts to a single public IP?",
+                "options": [
+                    "Unique TCP/UDP port numbers.",
+                    "Dynamic MAC addresses.",
+                    "VLAN tags."
+                ],
+                "correct_answer": 0,
+                "hint": "PAT stands for Port Address Translation.",
+                "explanation": "PAT tracks active connections by assigning unique source ports, enabling multiple inside hosts to share one public IP address."
+            },
+            {
+                "question": "Inside hosts cannot reach external servers. 'show ip nat translations' is empty. What is the most likely configuration error?",
+                "options": [
+                    "CEF is disabled on the router.",
+                    "The interface roles ('ip nat inside' and 'ip nat outside') are not applied or are reversed.",
+                    "The DNS server is down."
+                ],
+                "correct_answer": 1,
+                "hint": "The router needs to know which interfaces are inside (local) and outside (external).",
+                "explanation": "For NAT to trigger translations, the router interfaces must be labeled with 'ip nat inside' and 'ip nat outside' to identify source and destination traffic."
+            },
+            {
+                "question": "Which interface command configures PAT using the public IP on Gi0/0?",
+                "options": [
+                    "ip nat inside source list 1 interface GigabitEthernet0/0 overload",
+                    "ip nat pool public-pool 192.168.1.1 192.168.1.1 netmask 255.255.255.0",
+                    "ip nat inside"
+                ],
+                "correct_answer": 0,
+                "hint": "You need to reference the interface and specify the overload keyword.",
+                "explanation": "This command maps inside addresses matching ACL 1 to interface Gi0/0, using port overload (PAT) to share the IP address."
+            }
+        ]
+    },
+    "gateway": {
+        "overview": "A Default Gateway is a local interface IP address on a router or Layer 3 switch that host nodes use to forward packets to destinations outside their local subnet. Clients must be configured with a gateway on their same IP subnet.",
+        "questions": [
+            {
+                "question": "A client host is configured with IP 192.168.1.50/24. Which of the following is a valid default gateway IP?",
+                "options": [
+                    "192.168.2.1",
+                    "192.168.1.1",
+                    "10.0.0.1"
+                ],
+                "correct_answer": 1,
+                "hint": "The default gateway must reside on the same subnet as the host.",
+                "explanation": "The default gateway must be on the same local subnet (192.168.1.0/24) as the host, making 192.168.1.1 the only valid option."
+            },
+            {
+                "question": "A host cannot reach external subnets, and pinging 192.168.1.254 (gateway) yields timeout. 'arp -a' shows no MAC for the gateway. What is the cause?",
+                "options": [
+                    "DNS server is down.",
+                    "The gateway device is offline, shut down, or physical cabling is disconnected.",
+                    "There is a routing loop on the trunk."
+                ],
+                "correct_answer": 1,
+                "hint": "The host is not receiving ARP replies from the gateway's IP address.",
+                "explanation": "If ARP resolution fails, the gateway device is offline, its interface is down, or physical layer connectivity is broken."
+            },
+            {
+                "question": "A client gateway is configured as 192.168.1.254, but the router SVI is 192.168.1.1. How do you resolve the connection failure?",
+                "options": [
+                    "Configure static routes on the switch.",
+                    "Update the client configuration's default gateway IP to 192.168.1.1.",
+                    "Change the subnet mask to /16."
+                ],
+                "correct_answer": 1,
+                "hint": "The client must point to the actual IP configured on the router gateway.",
+                "explanation": "Updating the client gateway configuration to match the router's interface IP (192.168.1.1) restores off-subnet routing."
+            }
+        ]
+    },
+    "wireless": {
+        "overview": "Enterprise wireless networks deploy Lightweight Access Points (APs) that connect to a centralized Wireless LAN Controller (WLC). APs establish CAPWAP management and data tunnels with the WLC to route client traffic to the wired network.",
+        "questions": [
+            {
+                "question": "What protocol is used to tunnel management and user traffic between lightweight APs and a WLC?",
+                "options": [
+                    "802.1q",
+                    "CAPWAP",
+                    "OSPF"
+                ],
+                "correct_answer": 1,
+                "hint": "It creates UDP tunnels to manage lightweight access points.",
+                "explanation": "CAPWAP (Control and Provisioning of Wireless Access Points) is the standard protocol for tunneling AP data and control traffic to the WLC."
+            },
+            {
+                "question": "An AP fails WLC registration, displaying 'DTLS connection failed' in its logs. What does this mean?",
+                "options": [
+                    "The client SSID is incorrect.",
+                    "The security handshake or key validation failed between the AP and WLC.",
+                    "The AP default gateway is down."
+                ],
+                "correct_answer": 1,
+                "hint": "DTLS is a secure datagram protocol requiring valid certificates/keys.",
+                "explanation": "'DTLS connection failed' indicates the secure certificate or cryptographic key validation failed during the CAPWAP handshake."
+            },
+            {
+                "question": "An AP fails registration because the AP uplink trunk is missing the WLC management VLAN. How do you resolve this?",
+                "options": [
+                    "Place the AP in autonomous mode.",
+                    "Add the WLC management VLAN to the trunk port allowed-VLAN list on the switch.",
+                    "Assign the AP a static IP on a different subnet."
+                ],
+                "correct_answer": 1,
+                "hint": "The switch port connecting the AP must pass traffic for the WLC management VLAN.",
+                "explanation": "Adding the WLC management VLAN to the switch port's allowed trunk VLAN list enables CAPWAP traffic to flow between the AP and WLC."
+            }
+        ]
+    },
+    "interface": {
+        "overview": "Interfaces are physical (Ethernet, Serial) or logical (VLAN SVI, Loopback) connection ports on networking devices. Physical link state indicates Layer 1 connectivity, while line protocol state indicates Layer 2 framing and protocol keepalives.",
+        "questions": [
+            {
+                "question": "What does a port status of 'administratively down' mean on a Cisco switch?",
+                "options": [
+                    "The physical cable is disconnected.",
+                    "The port has been manually disabled using the 'shutdown' command.",
+                    "The connected device is powered off."
+                ],
+                "correct_answer": 1,
+                "hint": "This state is triggered by administrator command input.",
+                "explanation": "'Administratively down' means the port has been disabled in the configuration. It requires a 'no shutdown' command to activate."
+            },
+            {
+                "question": "An interface shows 'up, line protocol is down' and registers rising CRC errors. What is the cause?",
+                "options": [
+                    "The port is administratively disabled.",
+                    "Physical layer issues like bad cabling, noise, or a duplex mismatch.",
+                    "An OSPF timer mismatch on the link."
+                ],
+                "correct_answer": 1,
+                "hint": "Physical link is up, but framing errors are causing the protocol layer to fail.",
+                "explanation": "High CRC errors and line protocol down usually point to bad cabling, electromagnetic interference, or duplex mismatches causing packet corruption."
+            },
+            {
+                "question": "How do you re-enable an interface that shows 'administratively down'?",
+                "options": [
+                    "Enter interface configuration mode and type 'no shutdown'.",
+                    "Reload the switch config.",
+                    "Configure the port as a trunk."
+                ],
+                "correct_answer": 0,
+                "hint": "You need to reverse the shutdown command.",
+                "explanation": "Typing 'no shutdown' within the interface configuration mode re-enables the administratively disabled port."
+            }
+        ]
+    }
+}

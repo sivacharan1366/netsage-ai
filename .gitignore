@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Caches and logs
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+*.bak
+
+# API Keys / Environment files
+.env
+
+# Matplotlib cache
+.matplotlib/
